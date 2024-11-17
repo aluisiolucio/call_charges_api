@@ -9,7 +9,7 @@ from call_charges_api.domain.entities.phone_bill import PhoneBill
 @pytest.fixture
 def phone_bill():
     """Configura uma instância de PhoneBill para os testes."""
-    return PhoneBill(phone_number="1234567890", reference_period="11/2023")
+    return PhoneBill(phone_number='1234567890', reference_period='11/2023')
 
 
 def test_calculate_call_duration(phone_bill):
@@ -17,7 +17,7 @@ def test_calculate_call_duration(phone_bill):
     start_time = datetime(2023, 11, 1, 10, 0)
     end_time = datetime(2023, 11, 1, 10, 45)
     duration = phone_bill._calculate_call_duration(start_time, end_time)
-    assert duration == "0h45m0s"
+    assert duration == '0h45m0s'
 
 
 def test_calculate_call_cost_in_standard_rate(phone_bill):
@@ -54,18 +54,18 @@ def test_add_call_record_pair(phone_bill):
         call_id=1,
         call_type=CallType.START,
         timestamp=datetime(2023, 11, 1, 10, 0),
-        source="1234567890",
-        destination="0987654321"
+        source='1234567890',
+        destination='0987654321',
     )
     end_record = CallRecord(
         call_id=1,
         call_type=CallType.END,
-        timestamp=datetime(2023, 11, 1, 10, 30)
+        timestamp=datetime(2023, 11, 1, 10, 30),
     )
 
     phone_bill.add_call_record(start_record)
     result = phone_bill.add_call_record(end_record)
-    assert result == "Call record pair added."
+    assert result == 'Call record pair added.'
     assert len(phone_bill.call_records) == 1
 
 
@@ -75,11 +75,11 @@ def test_add_end_record_without_start(phone_bill):
     end_record = CallRecord(
         call_id=2,
         call_type=CallType.END,
-        timestamp=datetime(2023, 11, 1, 10, 30)
+        timestamp=datetime(2023, 11, 1, 10, 30),
     )
 
     result = phone_bill.add_call_record(end_record)
-    assert result == "Error: End record received without start record."
+    assert result == 'Error: End record received without start record.'
     assert len(phone_bill.call_records) == 0
 
 
@@ -89,13 +89,13 @@ def test_get_calls_summary(phone_bill):
         call_id=3,
         call_type=CallType.START,
         timestamp=datetime(2023, 11, 1, 8, 0),
-        source="1234567890",
-        destination="0987654321"
+        source='1234567890',
+        destination='0987654321',
     )
     end_record = CallRecord(
         call_id=3,
         call_type=CallType.END,
-        timestamp=datetime(2023, 11, 1, 8, 30)
+        timestamp=datetime(2023, 11, 1, 8, 30),
     )
 
     phone_bill.add_call_record(start_record)
@@ -104,6 +104,6 @@ def test_get_calls_summary(phone_bill):
     calls = phone_bill.get_calls()
     assert len(calls) == 1
     call = calls[0]
-    assert call["destination"] == "0987654321"
-    assert call["duration"] == "0h30m0s"
-    assert call["price"] == pytest.approx(0.36 + (30 * 0.09), rel=1e-2)
+    assert call['destination'] == '0987654321'
+    assert call['duration'] == '0h30m0s'
+    assert call['price'] == pytest.approx(0.36 + (30 * 0.09), rel=1e-2)
