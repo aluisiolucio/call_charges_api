@@ -1,6 +1,12 @@
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+
+from call_charges_api.domain.errors.exceptions import (
+    BusinessException,
+    InvalidPhoneNumberException,
+)
 
 
 class CallType(Enum):
@@ -23,21 +29,25 @@ class CallRecord:
         self.source = source
         self.destination = destination
 
-        self._validate()
-
-    def _validate(self):
+    def validate_call_record(self):
         if self.call_type == CallType.START:
             if not self.source or not self.destination:
-                raise ValueError(
+                raise BusinessException(
                     'Source and destination are required '
                     'for a start call record.'
                 )
         elif self.call_type == CallType.END:
-            if self.source or self.destination:
-                raise ValueError(
-                    'Source and destination should not '
-                    'be provided for an end call record.'
-                )
+            self.source = None
+            self.destination = None
+
+    def validate_phone_numbers(self) -> bool:
+        pattern = r'^\d{2}(?:\d{8}|\d{9})$'
+
+        if self.source and not re.match(pattern, self.source):
+            raise InvalidPhoneNumberException(self.source)
+
+        if self.destination and not re.match(pattern, self.destination):
+            raise InvalidPhoneNumberException(self.destination)
 
     def is_start(self) -> bool:
         return self.call_type == CallType.START
