@@ -37,7 +37,7 @@ addopts = '-p no:warnings'
 lint = 'ruff check .; ruff check . --diff'
 format = 'ruff check . --fix; ruff format .'
 run = 'fastapi dev call_charges_api/app.py'
-test = 'pytest -v -s -x'
+test = 'pytest -vv -s -x'
 
 [build-system]
 requires = ["poetry-core"]
