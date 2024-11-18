@@ -6,7 +6,10 @@ from sqlalchemy import engine_from_config, pool
 from call_charges_api.infra.config.settings import Settings
 from call_charges_api.infra.models.base import table_registry
 from call_charges_api.infra.models.call_record import (
-    CallRecordModel,  # noqa: F401
+    CallRecordModel,
+)
+from call_charges_api.infra.models.phone_bill import (
+    PhoneBillModel,
 )
 
 config = context.config
