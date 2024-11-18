@@ -14,3 +14,10 @@ class StartRecordNotFoundException(BusinessException):
     def __init__(self, call_id: int):
         message = f'Start call record with ID {call_id} was not found.'
         super().__init__(message)
+
+
+class ReferencePeriodFormatException(BusinessException):
+    def __init__(self):
+        message = 'The reference period format is invalid. '
+        'Use MM/YY or MM/YYYY.'
+        super().__init__(message)

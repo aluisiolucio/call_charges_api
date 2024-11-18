@@ -1,47 +1,50 @@
-from datetime import datetime, time, timedelta
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from datetime import date, datetime, time, timedelta
+from typing import Tuple
 
 from call_charges_api.domain.entities.call_record import CallRecord
 
 
+@dataclass
+class PhoneBillRecords:
+    destination: str
+    call_start_date: date
+    call_start_time: time
+    duration: str
+    price: str
+
+
 class PhoneBill:
-    def __init__(self, phone_number: str, reference_period: str):
+    def __init__(self, phone_number: str, reference_period: str | None = None):
         self.phone_number = phone_number
         self.reference_period = reference_period
-        self.call_records: List[Tuple[CallRecord, CallRecord]] = []
-        self._pending_records: Dict[int, CallRecord] = {}
+        self.total_amount: float = 0.0
 
-    def get_calls(self) -> List[dict]:
-        results = []
-        for start_record, end_record in self.call_records:
-            duration = self._calculate_call_duration(
-                start_record.timestamp, end_record.timestamp
-            )
-            price = self._calculate_call_cost(
-                start_record.timestamp, end_record.timestamp
-            )
+    @property
+    def formatted_total_amount(self) -> str:
+        return f'R$ {self.total_amount:.2f}'.replace('.', ',')
 
-            results.append({
-                'destination': start_record.destination,
-                'start_time': start_record.timestamp,
-                'end_time': end_record.timestamp,
-                'duration': duration,
-                'price': price,
-            })
+    def calculate_call_records(
+        self, call_records_pairs: Tuple[CallRecord, CallRecord]
+    ) -> PhoneBillRecords:
+        self.define_period()
 
-        return results
+        start_record, end_record = call_records_pairs
 
-    def add_call_record(self, call_record: CallRecord) -> Optional[str]:
-        if call_record.is_start():
-            self._pending_records[call_record.call_id] = call_record
-            return 'Start record added.'
-        elif call_record.is_end():
-            start_record = self._pending_records.pop(call_record.call_id, None)
-            if start_record:
-                self.call_records.append((start_record, call_record))
-                return 'Call record pair added.'
-            else:
-                return 'Error: End record received without start record.'
+        call_duration = self._calculate_call_duration(
+            start_record.timestamp, end_record.timestamp
+        )
+        call_price = self._calculate_call_cost(
+            start_record.timestamp, end_record.timestamp
+        )
+
+        return PhoneBillRecords(
+            destination=start_record.destination,
+            call_start_date=start_record.timestamp.date(),
+            call_start_time=start_record.timestamp.time(),
+            duration=call_duration,
+            price=call_price,
+        )
 
     @staticmethod
     def _calculate_call_duration(
@@ -81,8 +84,26 @@ class PhoneBill:
 
     def _calculate_call_cost(
         self, start_time: datetime, end_time: datetime
-    ) -> float:
+    ) -> str:
         fixed_rate = 0.36
         rate_per_call = self._calculate_rate_per_call(start_time, end_time)
 
-        return fixed_rate + rate_per_call
+        value = fixed_rate + rate_per_call
+        self.total_amount += value
+
+        return f'R$ {value:.2f}'.replace('.', ',')
+
+    def define_period(self):
+        DECEMBER = 12
+
+        if not self.reference_period:
+            current_date = datetime.now()
+            last_month = (
+                current_date.month - 1 if current_date.month > 1 else DECEMBER
+            )
+            year = current_date.year
+
+            if last_month == DECEMBER:
+                year -= 1
+
+            self.reference_period = f'{last_month}/{year}'

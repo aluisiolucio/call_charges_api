@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from call_charges_api.domain.entities.call_record import CallType
 
 
-class RequestSchema(BaseModel):
+class CallRecordRequestSchema(BaseModel):
     type: CallType
     timestamp: str
     call_id: int
@@ -15,7 +15,7 @@ class RequestSchema(BaseModel):
     destination: Optional[str] = None
 
 
-class ResponseSchema(BaseModel):
+class CallRecordResponseSchema(BaseModel):
     id: UUID
     type: str
     timestamp: datetime

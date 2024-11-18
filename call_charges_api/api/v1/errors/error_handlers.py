@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from call_charges_api.domain.errors.exceptions import (
     BusinessException,
     InvalidPhoneNumberException,
+    ReferencePeriodFormatException,
     StartRecordNotFoundException,
 )
 
@@ -35,11 +36,19 @@ def handle_error(exception: Exception) -> HTTPException:
             },
         )
 
+    if isinstance(exception, ReferencePeriodFormatException):
+        return HTTPException(
+            status_code=422,
+            detail={
+                'error': 'ReferencePeriodFormatException',
+                'message': exception.message,
+            },
+        )
+
     return HTTPException(
         status_code=500,
         detail={
             'error': 'InternalServerError',
-            'message': 'Oops! An unexpected error occurred. '
-            'Please try again later.',
+            'message': 'Oops! An unexpected error occurred.',
         },
     )
