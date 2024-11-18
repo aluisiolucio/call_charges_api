@@ -106,12 +106,10 @@ def test_create_repeated_start_record(client, valid_start_record):
     assert response.json().get('timestamp') == valid_start_record_repeated.get(
         'timestamp'
     )
-    assert response.json().get('source') == valid_start_record_repeated.get(
-        'source'
-    )
-    assert response.json().get(
+    assert response.json().get('source') == valid_start_record.get('source')
+    assert response.json().get('destination') == valid_start_record.get(
         'destination'
-    ) == valid_start_record_repeated.get('destination')
+    )
 
 
 def test_create_repeated_end_record(
@@ -152,3 +150,58 @@ def test_create_repeated_end_record(
     assert response.json().get('timestamp') == valid_end_record_repeated.get(
         'timestamp'
     )
+
+
+def test_create_multiple_records_to_subscriber(
+    client, valid_start_record, valid_end_record
+):
+    response = client.put('api/v1/call_records', json=valid_start_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    response = client.put('api/v1/call_records', json=valid_end_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+    valid_start_record['call_id'] = 2
+    valid_end_record['call_id'] = 2
+
+    response = client.put('api/v1/call_records', json=valid_start_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    response = client.put('api/v1/call_records', json=valid_end_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+
+def test_create_multiple_records_to_subscriber_out_of_order(
+    client, valid_start_record, valid_end_record
+):
+    response = client.put('api/v1/call_records', json=valid_start_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    valid_start_record['call_id'] = 2
+
+    response = client.put('api/v1/call_records', json=valid_start_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    response = client.put('api/v1/call_records', json=valid_end_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+    valid_end_record['call_id'] = 2
+
+    response = client.put('api/v1/call_records', json=valid_end_record)
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
