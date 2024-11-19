@@ -10,12 +10,14 @@ from call_charges_api.api.v1.schemas.phone_bill import (
     PhoneBillListSchema,
     PhoneBillResponseSchema,
 )
+from call_charges_api.api.v1.schemas.user import CurrentUserSchema
 from call_charges_api.domain.use_cases.get_phone_bill import (
     GetPhoneBillUseCase,
 )
 from call_charges_api.domain.use_cases.get_phone_bill import (
     Input as GetPhoneBillInput,
 )
+from call_charges_api.infra.config.security import get_current_user
 from call_charges_api.infra.db.session import get_session
 from call_charges_api.infra.sqlalchemy_repos.sqlalchemy_phone_bill_repository import (  # noqa: E501
     SQLAlchemyPhoneBillRepository,
@@ -32,6 +34,7 @@ router = APIRouter(prefix='/api/v1', tags=['phone_bill'])
 def get_phone_bill(
     phone_bill_filters: Annotated[FiltersSchema, Query()],
     session: Session = Depends(get_session),
+    _: CurrentUserSchema = Depends(get_current_user),
 ):
     try:
         repo = SQLAlchemyPhoneBillRepository(session)

@@ -8,12 +8,14 @@ from call_charges_api.api.v1.schemas.call_record import (
     CallRecordRequestSchema,
     CallRecordResponseSchema,
 )
+from call_charges_api.api.v1.schemas.user import CurrentUserSchema
 from call_charges_api.domain.use_cases.register_call import (
     Input as RegisterCallInput,
 )
 from call_charges_api.domain.use_cases.register_call import (
     RegisterCallUseCase,
 )
+from call_charges_api.infra.config.security import get_current_user
 from call_charges_api.infra.db.session import get_session
 from call_charges_api.infra.sqlalchemy_repos.sqlalchemy_call_record_repository import (  # noqa: E501
     SQLAlchemyCallRecordRepository,
@@ -33,6 +35,7 @@ router = APIRouter(prefix='/api/v1', tags=['call_records'])
 def register_call(
     call_record_schema: CallRecordRequestSchema,
     session: Session = Depends(get_session),
+    _: CurrentUserSchema = Depends(get_current_user),
 ):
     call_record_repo = SQLAlchemyCallRecordRepository(session)
     phone_bill_repo = SQLAlchemyPhoneBillRepository(session)
