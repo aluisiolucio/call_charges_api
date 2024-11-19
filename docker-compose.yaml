@@ -1,0 +1,25 @@
+services:
+  call_charges_db:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/bitnami/postgresql
+
+  call_charges_app:
+    image: call_charges_app
+    entrypoint: ./entrypoint.sh
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - call_charges_db
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@call_charges_db:5432/${DB_NAME}
+
+volumes:
+  pgdata:
