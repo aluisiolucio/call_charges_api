@@ -11,8 +11,8 @@ from zoneinfo import ZoneInfo
 from call_charges_api.infra.config.settings import Settings
 
 SECRET_KEY = Settings().SECRET_KEY
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ALGORITHM = Settings().ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = Settings().ACCESS_TOKEN_EXPIRE_MINUTES
 pwd_context = PasswordHash.recommended()
 
 
