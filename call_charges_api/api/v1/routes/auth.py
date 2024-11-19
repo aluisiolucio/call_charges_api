@@ -20,16 +20,17 @@ from call_charges_api.infra.sqlalchemy_repos.sqlalchemy_user_repository import (
     SQLAlchemyUserRepository,
 )
 
-router = APIRouter(tags=['auth'])
+router = APIRouter(prefix='/api/v1/auth', tags=['auth'])
 
 
 @router.post(
-    '/register',
+    '/sign_up',
     status_code=HTTPStatus.CREATED,
     response_model=UserOutputSchema,
 )
 def sign_up(
-    user_schema: UserInputSchema, session: Session = Depends(get_session)
+    user_schema: UserInputSchema,
+    session: Session = Depends(get_session)
 ):
     repo = SQLAlchemyUserRepository(session)
     use_case = SignUpUseCase(repo)
@@ -48,7 +49,7 @@ def sign_up(
         raise handle_error(e)
 
 
-@router.post('/token', response_model=TokenOutputSchema)
+@router.post('/sign_in', response_model=TokenOutputSchema)
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: Session = Depends(get_session),

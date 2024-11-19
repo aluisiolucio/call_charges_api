@@ -16,7 +16,7 @@ from call_charges_api.infra.models.user import UserModel
 @pytest.fixture
 def token(client, user):
     response = client.post(
-        '/token',
+        '/api/v1/auth/sign_in',
         data={'username': user.username, 'password': user.clean_password},
     )
     return response.json()['access_token']
