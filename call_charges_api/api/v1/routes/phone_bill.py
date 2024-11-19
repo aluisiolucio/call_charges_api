@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Annotated
+from typing import Annotated, Dict
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -10,7 +10,6 @@ from call_charges_api.api.v1.schemas.phone_bill import (
     PhoneBillListSchema,
     PhoneBillResponseSchema,
 )
-from call_charges_api.api.v1.schemas.user import CurrentUserSchema
 from call_charges_api.domain.use_cases.get_phone_bill import (
     GetPhoneBillUseCase,
 )
@@ -34,7 +33,7 @@ router = APIRouter(prefix='/api/v1', tags=['phone_bill'])
 def get_phone_bill(
     phone_bill_filters: Annotated[FiltersSchema, Query()],
     session: Session = Depends(get_session),
-    _: CurrentUserSchema = Depends(get_current_user),
+    _: Dict = Depends(get_current_user),
 ):
     try:
         repo = SQLAlchemyPhoneBillRepository(session)

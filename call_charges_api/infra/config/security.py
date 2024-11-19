@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jwt import DecodeError, decode, encode
+from jwt import DecodeError, ExpiredSignatureError, decode, encode
 from pwdlib import PasswordHash
 from zoneinfo import ZoneInfo
 
@@ -39,7 +40,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/v1/auth/sign_in')
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
-):
+) -> Dict:
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail='Could not validate credentials',
@@ -55,5 +56,7 @@ def get_current_user(
             raise credentials_exception
     except DecodeError:
         raise credentials_exception
+    except ExpiredSignatureError:
+        raise credentials_exception
 
-    return {'id': uid, 'username': username}
+    return {'uid': uid, 'username': username}

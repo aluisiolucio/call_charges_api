@@ -81,3 +81,21 @@ class SignUpUseCase:
             id=user_output.id,
             username=user_output.username,
         )
+
+
+class RefreshTokenUseCase:
+    @staticmethod
+    def execute(id: UUID, username: str) -> AuthOutput:
+        access_token = create_access_token(
+            data={
+                'uid': str(id),
+                'sub': username,
+            }
+        )
+
+        return AuthOutput(
+            id=id,
+            username=username,
+            access_token=access_token,
+            token_type='bearer',
+        )

@@ -12,8 +12,3 @@ class UserInputSchema(BaseModel):
 class UserOutputSchema(BaseModel):
     id: UUID
     username: EmailStr
-
-
-class CurrentUserSchema(BaseModel):
-    id: UUID | None = None
-    username: EmailStr | None = None

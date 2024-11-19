@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
@@ -12,8 +13,12 @@ from call_charges_api.api.v1.schemas.user import (
 )
 from call_charges_api.domain.use_cases.auth import (
     AuthInput,
+    RefreshTokenUseCase,
     SignInUseCase,
     SignUpUseCase,
+)
+from call_charges_api.infra.config.security import (
+    get_current_user,
 )
 from call_charges_api.infra.db.session import get_session
 from call_charges_api.infra.sqlalchemy_repos.sqlalchemy_user_repository import (  # noqa: E501
@@ -29,8 +34,7 @@ router = APIRouter(prefix='/api/v1/auth', tags=['auth'])
     response_model=UserOutputSchema,
 )
 def sign_up(
-    user_schema: UserInputSchema,
-    session: Session = Depends(get_session)
+    user_schema: UserInputSchema, session: Session = Depends(get_session)
 ):
     repo = SQLAlchemyUserRepository(session)
     use_case = SignUpUseCase(repo)
@@ -74,3 +78,21 @@ def sign_in(
     except Exception as e:
         print(e)
         raise handle_error(e)
+
+
+@router.post('/refresh_token', response_model=TokenOutputSchema)
+def refresh_access_token(
+    current_user: Dict = Depends(get_current_user),
+):
+    use_case = RefreshTokenUseCase()
+    refresh_token = use_case.execute(
+        id=current_user['uid'],
+        username=current_user['username'],
+    )
+
+    return TokenOutputSchema(
+        id=refresh_token.id,
+        username=refresh_token.username,
+        access_token=refresh_token.access_token,
+        token_type=refresh_token.token_type,
+    )

@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Dict
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -8,7 +9,6 @@ from call_charges_api.api.v1.schemas.call_record import (
     CallRecordRequestSchema,
     CallRecordResponseSchema,
 )
-from call_charges_api.api.v1.schemas.user import CurrentUserSchema
 from call_charges_api.domain.use_cases.register_call import (
     Input as RegisterCallInput,
 )
@@ -35,7 +35,7 @@ router = APIRouter(prefix='/api/v1', tags=['call_records'])
 def register_call(
     call_record_schema: CallRecordRequestSchema,
     session: Session = Depends(get_session),
-    _: CurrentUserSchema = Depends(get_current_user),
+    _: Dict = Depends(get_current_user),
 ):
     call_record_repo = SQLAlchemyCallRecordRepository(session)
     phone_bill_repo = SQLAlchemyPhoneBillRepository(session)
