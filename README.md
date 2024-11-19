@@ -54,7 +54,7 @@ Este projeto é uma API desenvolvida utilizando `Python/FastAPI` para receber re
 A API está diponível com uma interface interativa para testar os endpoints, utilizando o **Swagger UI**.
 
 - Para acessar o Swagger, abra o navegador e vá até o endereço:  
-  [Swagger Call Charges API](http://127.0.0.1:8000/docs)
+  [Swagger Call Charges API](https://call-charges-api.fly.dev/docs)
 
 O Swagger permite testar as rotas de maneira simples e visualizar todos os detalhes da API.
 
