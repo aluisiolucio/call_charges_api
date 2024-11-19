@@ -126,7 +126,7 @@ def test_create_repeated_start_record(client, token, valid_start_record):
         'type': 'start',
         'timestamp': '2023-11-01T10:40:00',
         'source': '0987654321',
-        'destination': '0987654321',
+        'destination': '1234567890',
     }
 
     response = client.put(

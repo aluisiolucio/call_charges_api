@@ -3,6 +3,7 @@ from datetime import datetime
 
 from call_charges_api.domain.entities.call_record import CallRecord, CallType
 from call_charges_api.domain.errors.exceptions import (
+    InvalidPhoneNumberException,
     StartRecordNotFoundException,
 )
 from call_charges_api.domain.use_cases.save_phone_bill import (
@@ -47,6 +48,26 @@ class RegisterCallUseCase:
         self.phone_bill_repository = phone_bill_repository
 
     def execute(self, input: Input) -> Output:
+        if input.source:
+            input.source = (
+                input.source.replace(' ', '')
+                .replace('-', '')
+                .replace('(', '')
+                .replace(')', '')
+                .replace('+55', '')
+            )
+        if input.destination:
+            input.destination = (
+                input.destination.replace(' ', '')
+                .replace('-', '')
+                .replace('(', '')
+                .replace(')', '')
+                .replace('+55', '')
+            )
+
+        if input.source and input.source == input.destination:
+            raise InvalidPhoneNumberException(input.source)
+
         call_record = CallRecord(
             call_id=input.call_id,
             call_type=input.call_type,

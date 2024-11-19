@@ -58,19 +58,39 @@ class PhoneBill:
 
     @staticmethod
     def _calculate_minutes_between(
-        start_time: datetime, end_time: datetime
+        start_datetime: datetime, end_datetime: datetime
     ) -> int:
-        nighttime_start = time(22, 0)
-        nighttime_end = time(6, 0)
+        morning_start = time(6, 1, 0)
+        night_end = time(21, 59, 59)
+
+        def calculate_daily_minutes(start: time, end: time) -> int:
+            valid_start = max(start, morning_start)
+            valid_end = min(end, night_end)
+            if valid_start >= valid_end:
+                return 0
+            return (
+                datetime.combine(datetime.min, valid_end)
+                - datetime.combine(datetime.min, valid_start)
+            ).seconds // 60
 
         total_minutes = 0
-        current_time = start_time
+        current_datetime = start_datetime
 
-        while current_time < end_time:
-            if nighttime_end <= current_time.time() < nighttime_start:
-                total_minutes += 1
+        while current_datetime.date() <= end_datetime.date():
+            if current_datetime.date() == start_datetime.date():
+                start_time = current_datetime.time()
+            else:
+                start_time = morning_start
 
-            current_time += timedelta(minutes=1)
+            if current_datetime.date() == end_datetime.date():
+                end_time = end_datetime.time()
+            else:
+                end_time = night_end
+
+            total_minutes += calculate_daily_minutes(start_time, end_time)
+            current_datetime = datetime.combine(
+                current_datetime.date() + timedelta(days=1), time(0, 0, 0)
+            )
 
         return total_minutes
 
