@@ -115,15 +115,19 @@ class PhoneBill:
 
     def define_period(self):
         DECEMBER = 12
+        current_date = datetime.now()
+        current_month = current_date.month
+        current_year = current_date.year
 
-        if not self.reference_period:
-            current_date = datetime.now()
-            last_month = (
-                current_date.month - 1 if current_date.month > 1 else DECEMBER
-            )
-            year = current_date.year
+        last_month = current_month - 1 if current_month > 1 else DECEMBER
+        year = current_year
 
-            if last_month == DECEMBER:
-                year -= 1
+        if last_month == DECEMBER:
+            year -= 1
 
+        if self.reference_period:
+            current_reference_period = f'{current_month}/{current_year}'
+            if self.reference_period == current_reference_period:
+                self.reference_period = f'{last_month}/{year}'
+        else:
             self.reference_period = f'{last_month}/{year}'
