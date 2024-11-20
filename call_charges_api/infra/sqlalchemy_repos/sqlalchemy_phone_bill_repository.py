@@ -1,3 +1,4 @@
+from collections import defaultdict
 from uuid import uuid4
 
 from sqlalchemy import select
@@ -35,33 +36,24 @@ class SQLAlchemyPhoneBillRepository(PhoneBillRepository):
         ).all()
 
         pairs = []
+        pending_records = defaultdict(lambda: {'start': None, 'end': None})
+
         for record in records:
-            if record.type == 'start':
-                pairs.append({
-                    'start': CallRecordOutput(
-                        id=record.id,
-                        call_id=record.call_id,
-                        call_type=record.type,
-                        timestamp=record.timestamp,
-                        source=record.source,
-                        destination=record.destination,
-                        status=record.status,
-                    ),
-                    'end': None,
-                })
-            else:
-                for pair in pairs:
-                    if pair['start'].call_id == record.call_id:
-                        pair['end'] = CallRecordOutput(
-                            id=record.id,
-                            call_id=record.call_id,
-                            call_type=record.type,
-                            timestamp=record.timestamp,
-                            source=record.source,
-                            destination=record.destination,
-                            status=record.status,
-                        )
-                        break
+            pending_records[record.call_id][record.type] = CallRecordOutput(
+                id=record.id,
+                call_id=record.call_id,
+                call_type=record.type,
+                timestamp=record.timestamp,
+                source=record.source,
+                destination=record.destination,
+                status=record.status,
+            )
+
+            if (
+                pending_records[record.call_id]['start']
+                and pending_records[record.call_id]['end']
+            ):
+                pairs.append(pending_records.pop(record.call_id))
 
         result_as_tuples = [(pair['start'], pair['end']) for pair in pairs]
 

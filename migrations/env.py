@@ -11,6 +11,7 @@ from call_charges_api.infra.models.call_record import (
 from call_charges_api.infra.models.phone_bill import (
     PhoneBillModel,
 )
+from call_charges_api.infra.models.user import UserModel
 
 config = context.config
 config.set_main_option('sqlalchemy.url', Settings().DATABASE_URL)
