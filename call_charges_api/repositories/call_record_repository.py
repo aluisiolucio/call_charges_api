@@ -41,6 +41,12 @@ class CallRecordRepository(ABC):
         pass
 
     @abstractmethod
+    def record_exists_by_id(
+        self, id: UUID, call_id: int, call_type: str
+    ) -> bool:
+        pass
+
+    @abstractmethod
     def record_start_exists(self, call_id: int) -> bool:
         pass
 

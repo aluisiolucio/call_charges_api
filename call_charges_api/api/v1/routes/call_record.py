@@ -44,6 +44,7 @@ def register_call(
     try:
         record = use_case.execute(
             RegisterCallInput(
+                id=call_record_schema.id,
                 call_type=call_record_schema.type,
                 timestamp=call_record_schema.timestamp,
                 call_id=call_record_schema.call_id,

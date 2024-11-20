@@ -42,6 +42,16 @@ class SQLAlchemyCallRecordRepository(CallRecordRepository):
             status=model.status,
         )
 
+    def record_start_exists(self, call_id: int) -> bool:
+        model = self.session.scalar(
+            select(CallRecordModel).where(
+                CallRecordModel.call_id == call_id
+                and CallRecordModel.type == 'start'
+            )
+        )
+
+        return model is not None
+
     def record_exists(self, call_id: int, call_type: str) -> bool:
         model = self.session.scalar(
             select(CallRecordModel)
@@ -51,12 +61,14 @@ class SQLAlchemyCallRecordRepository(CallRecordRepository):
 
         return model is not None
 
-    def record_start_exists(self, call_id: int) -> bool:
+    def record_exists_by_id(
+        self, id: UUID, call_id: int, call_type: str
+    ) -> bool:
         model = self.session.scalar(
-            select(CallRecordModel).where(
-                CallRecordModel.call_id == call_id
-                and CallRecordModel.type == 'start'
-            )
+            select(CallRecordModel)
+            .where(CallRecordModel.id == id)
+            .filter(CallRecordModel.call_id == call_id)
+            .filter(CallRecordModel.type == call_type)
         )
 
         return model is not None

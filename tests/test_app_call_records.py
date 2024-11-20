@@ -110,6 +110,9 @@ def test_create_repeated_start_record(client, token, valid_start_record):
         headers={'Authorization': f'Bearer {token}'},
         json=valid_start_record,
     )
+
+    id = response.json().get('id')
+
     assert response.status_code == HTTPStatus.CREATED
     assert response.json().get('call_id') == valid_start_record.get('call_id')
     assert response.json().get('type') == valid_start_record.get('type')
@@ -122,6 +125,7 @@ def test_create_repeated_start_record(client, token, valid_start_record):
     )
 
     valid_start_record_repeated = {
+        'id': id,
         'call_id': 1,
         'type': 'start',
         'timestamp': '2023-11-01T10:40:00',
@@ -135,6 +139,7 @@ def test_create_repeated_start_record(client, token, valid_start_record):
         json=valid_start_record_repeated,
     )
     assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == id
     assert response.json().get('call_id') == valid_start_record.get('call_id')
     assert response.json().get('type') == valid_start_record.get('type')
     assert response.json().get('timestamp') == valid_start_record_repeated.get(
@@ -170,6 +175,9 @@ def test_create_repeated_end_record(
         headers={'Authorization': f'Bearer {token}'},
         json=valid_end_record,
     )
+
+    id = response.json().get('id')
+
     assert response.status_code == HTTPStatus.CREATED
     assert response.json().get('call_id') == valid_end_record.get('call_id')
     assert response.json().get('type') == valid_end_record.get('type')
@@ -178,6 +186,7 @@ def test_create_repeated_end_record(
     )
 
     valid_end_record_repeated = {
+        'id': id,
         'call_id': 1,
         'type': 'end',
         'timestamp': '2023-11-01T11:00:00',
@@ -189,6 +198,7 @@ def test_create_repeated_end_record(
         json=valid_end_record_repeated,
     )
     assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == id
     assert response.json().get('call_id') == valid_end_record.get('call_id')
     assert response.json().get('type') == valid_end_record.get('type')
     assert response.json().get('timestamp') == valid_end_record_repeated.get(
@@ -281,3 +291,172 @@ def test_create_multiple_records_to_subscriber_out_of_order(
     assert response.status_code == HTTPStatus.CREATED
     assert response.json().get('call_id') == valid_end_record.get('call_id')
     assert response.json().get('type') == valid_end_record.get('type')
+
+
+def test_update_start_record(client, token, valid_start_record):
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    valid_start_record['id'] = id
+    valid_start_record['timestamp'] = '2023-11-01T10:40:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == id
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+    assert response.json().get('timestamp') == '2023-11-01T10:40:00'
+
+
+def test_update_end_record(
+    client, token, valid_start_record, valid_end_record
+):
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+    valid_end_record['id'] = id
+    valid_end_record['timestamp'] = '2023-11-01T11:00:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == id
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+    assert response.json().get('timestamp') == '2023-11-01T11:00:00'
+
+
+def test_update_end_record_with_wrong_id(
+    client, token, valid_start_record, valid_end_record
+):
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    start_id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+    valid_end_record['id'] = start_id
+    valid_end_record['timestamp'] = '2023-11-01T11:00:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == id
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+    assert response.json().get('timestamp') == '2023-11-01T11:00:00'
+
+
+def test_update_record_without_id(
+    client, token, valid_start_record, valid_end_record
+):
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    start_id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+
+    valid_start_record['timestamp'] = '2023-11-01T10:40:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_start_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == start_id
+    assert response.json().get('call_id') == valid_start_record.get('call_id')
+    assert response.json().get('type') == valid_start_record.get('type')
+    assert response.json().get('timestamp') == '2023-11-01T10:40:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    end_id = response.json().get('id')
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+
+    valid_end_record['timestamp'] = '2023-11-01T11:00:00'
+
+    response = client.put(
+        'api/v1/call_records',
+        headers={'Authorization': f'Bearer {token}'},
+        json=valid_end_record,
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json().get('id') == end_id
+    assert response.json().get('call_id') == valid_end_record.get('call_id')
+    assert response.json().get('type') == valid_end_record.get('type')
+    assert response.json().get('timestamp') == '2023-11-01T11:00:00'

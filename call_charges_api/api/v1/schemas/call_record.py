@@ -13,6 +13,7 @@ class CallRecordRequestSchema(BaseModel):
     call_id: int
     source: Optional[str] = None
     destination: Optional[str] = None
+    id: Optional[UUID] = None
 
 
 class CallRecordResponseSchema(BaseModel):

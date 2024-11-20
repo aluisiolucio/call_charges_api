@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
+from uuid import UUID
 
 from call_charges_api.domain.entities.call_record import CallRecord, CallType
 from call_charges_api.domain.errors.exceptions import (
@@ -26,6 +28,7 @@ class Input:
     call_id: int
     source: str
     destination: str
+    id: Optional[UUID] = None
 
 
 @dataclass
@@ -87,9 +90,19 @@ class RegisterCallUseCase:
         if not contains_start_record and call_record.is_end():
             raise StartRecordNotFoundException(call_record.call_id)
 
-        record_exists = self.call_record_repository.record_exists(
-            call_id=call_record.call_id, call_type=call_record.call_type.value
-        )
+        record_exists = False
+        if input.id:
+            record_exists = self.call_record_repository.record_exists_by_id(
+                id=input.id,
+                call_id=call_record.call_id,
+                call_type=call_record.call_type.value,
+            )
+
+        if not record_exists:
+            record_exists = self.call_record_repository.record_exists(
+                call_id=call_record.call_id,
+                call_type=call_record.call_type.value,
+            )
 
         if record_exists:
             record = self.call_record_repository.update(
