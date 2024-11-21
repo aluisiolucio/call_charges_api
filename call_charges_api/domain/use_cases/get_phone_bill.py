@@ -30,6 +30,7 @@ class GetPhoneBillUseCase:
     def execute(self, input: Input) -> Output:
         input.phone_number = (
             input.phone_number
+            .replace(' ', '')
             .replace('-', '')
             .replace('(', '')
             .replace(')', '')
