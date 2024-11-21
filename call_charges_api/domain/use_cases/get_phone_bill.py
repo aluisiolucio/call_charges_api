@@ -28,6 +28,14 @@ class GetPhoneBillUseCase:
         self.repository = repository
 
     def execute(self, input: Input) -> Output:
+        input.phone_number = (
+            input.phone_number
+            .replace('-', '')
+            .replace('(', '')
+            .replace(')', '')
+            .replace('+55', '')
+        )
+
         phone_bill_entity = PhoneBill(
             phone_number=input.phone_number,
             reference_period=input.reference_period,
