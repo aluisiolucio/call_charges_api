@@ -93,24 +93,6 @@ Esta API atende aos seguintes requisitos principais:
    - **POST /api/v1/auth/sign_in**: Login.
    - **POST /api/v1/auth/refresh_token**: Renovação do token.
 
-## 🌐 Deploy com CI/CD no Fly.io
-
-Este projeto está configurado para **Continuous Integration (CI)** e **Continuous Deployment (CD)**, utilizando Github Actions e Fly.io como ambiente de produção.
-
-### Configurações do Fly.io
-
-- **Aplicação**: `call-charges-api`
-- **Região primária**: `gru` (São Paulo, Brasil)
-- **Configuração da Máquina Virtual**:
-  - Tamanho: `shared-cpu-1x`
-  - Memória: `256MB`
-
-Com essa configuração, o ambiente de produção é eficiente e econômico, inicializando sob demanda e garantindo alta disponibilidade.
-
-### Acesso à API em Produção
-
-A documentação interativa está acessível via Swagger UI em: [Swagger Call Charges API](https://call-charges-api.fly.dev/docs).
-
 ## 🧪 Testes
 
 Para executar os testes é necessário ter o Poetry instalado.
