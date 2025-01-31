@@ -52,7 +52,7 @@ def get_current_user(
         uid: str = payload.get('uid')
         username: str = payload.get('sub')
 
-        if not id or not username:
+        if not uid or not username:
             raise credentials_exception
     except DecodeError:
         raise credentials_exception

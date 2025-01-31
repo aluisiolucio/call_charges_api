@@ -31,15 +31,15 @@ class PhoneBill:
 
         start_record, end_record = call_records_pairs
 
-        call_duration = self._calculate_call_duration(
+        call_duration = self.__calculate_call_duration(
             start_record.timestamp, end_record.timestamp
         )
-        call_price = self._calculate_call_cost(
+        call_price = self.__calculate_call_cost(
             start_record.timestamp, end_record.timestamp
         )
 
         return PhoneBillRecords(
-            destination=start_record.destination,
+            destination=start_record.destination or '',
             call_start_date=start_record.timestamp.date(),
             call_start_time=start_record.timestamp.time(),
             duration=call_duration,
@@ -47,7 +47,7 @@ class PhoneBill:
         )
 
     @staticmethod
-    def _calculate_call_duration(
+    def __calculate_call_duration(
         start_time: datetime, end_time: datetime
     ) -> str:
         duration = end_time - start_time
@@ -57,7 +57,7 @@ class PhoneBill:
         return f'{int(hours)}h{int(minutes)}m{int(seconds)}s'
 
     @staticmethod
-    def _calculate_minutes_between(
+    def __calculate_minutes_between(
         start_datetime: datetime, end_datetime: datetime
     ) -> int:
         morning_start = time(6, 1, 0)
@@ -94,19 +94,19 @@ class PhoneBill:
 
         return total_minutes
 
-    def _calculate_rate_per_call(
+    def __calculate_rate_per_call(
         self, start_time: datetime, end_time: datetime
     ) -> float:
         rate_per_call = 0.09
-        minutes = self._calculate_minutes_between(start_time, end_time)
+        minutes = self.__calculate_minutes_between(start_time, end_time)
 
         return minutes * rate_per_call
 
-    def _calculate_call_cost(
+    def __calculate_call_cost(
         self, start_time: datetime, end_time: datetime
     ) -> str:
         fixed_rate = 0.36
-        rate_per_call = self._calculate_rate_per_call(start_time, end_time)
+        rate_per_call = self.__calculate_rate_per_call(start_time, end_time)
 
         value = fixed_rate + rate_per_call
         self.total_amount += value

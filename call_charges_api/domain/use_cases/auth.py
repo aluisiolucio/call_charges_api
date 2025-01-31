@@ -42,7 +42,9 @@ class SignInUseCase:
         if not user:
             raise UserNotFoundException(input.username)
 
-        if not verify_password(input.password, user.password):
+        if not user.password or not verify_password(
+            input.password, user.password
+        ):
             raise InvalidCredentialsException()
 
         access_token = create_access_token(
