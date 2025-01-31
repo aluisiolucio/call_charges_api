@@ -37,14 +37,16 @@ def phone_bill():
 def test_calculate_call_duration(phone_bill):
     start_time = datetime(2023, 11, 1, 10, 0)
     end_time = datetime(2023, 11, 1, 10, 45)
-    duration = phone_bill._calculate_call_duration(start_time, end_time)
+    duration = phone_bill._PhoneBill__calculate_call_duration(
+        start_time, end_time
+    )
     assert duration == '0h45m0s'
 
 
 def test_calculate_call_cost(phone_bill):
     start_time = datetime(2023, 11, 1, 21, 57)
     end_time = datetime(2023, 11, 1, 22, 5)
-    cost = phone_bill._calculate_call_cost(start_time, end_time)
+    cost = phone_bill._PhoneBill__calculate_call_cost(start_time, end_time)
     assert cost == 'R$ 0,54'
 
 
@@ -85,7 +87,9 @@ def test_calculate_minutes_between(phone_bill):
     start_time = datetime(2023, 11, 1, 21, 55)
     end_time = datetime(2023, 11, 1, 22, 5)
     expected_minutes = 4
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
     assert minutes == expected_minutes
 
 
@@ -94,7 +98,9 @@ def test_calculate_minutes_between_trucate(phone_bill):
     end_time = datetime.fromisoformat('2017-12-11T15:14:56Z')
 
     expected_minutes = 7
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
     assert minutes == expected_minutes
 
 
@@ -102,7 +108,9 @@ def test_calculate_minutes_between_different_days(phone_bill):
     start_time = datetime.fromisoformat('2018-02-28T21:57:13Z')
     end_time = datetime.fromisoformat('2018-03-01T22:10:56Z')
 
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
 
     expected_minutes = 960
     assert minutes == expected_minutes
@@ -112,7 +120,9 @@ def test_single_day_fully_diurnal(phone_bill):
     start_time = datetime.fromisoformat('2023-11-01T06:00:00+00:00')
     end_time = datetime.fromisoformat('2023-11-01T22:00:00+00:00')
 
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
 
     expected_minutes = 958
     assert minutes == expected_minutes
@@ -122,7 +132,9 @@ def test_no_minutes_in_nighttime(phone_bill):
     start_time = datetime.fromisoformat('2023-11-01T23:00:00+00:00')
     end_time = datetime.fromisoformat('2023-11-02T05:59:59+00:00')
 
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
 
     expected_minutes = 0
     assert minutes == expected_minutes
@@ -132,7 +144,9 @@ def test_crossing_midnight(phone_bill):
     start_time = datetime.fromisoformat('2023-11-01T21:55:00+00:00')
     end_time = datetime.fromisoformat('2023-11-02T06:05:00+00:00')
 
-    minutes = phone_bill._calculate_minutes_between(start_time, end_time)
+    minutes = phone_bill._PhoneBill__calculate_minutes_between(
+        start_time, end_time
+    )
 
     expected_minutes = 8
     assert minutes == expected_minutes
